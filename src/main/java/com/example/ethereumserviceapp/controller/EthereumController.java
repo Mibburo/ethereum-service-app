@@ -52,6 +52,10 @@ public class EthereumController {
                 
     }
 
+
+
+    // remove underneath methods... to use for dev purposes only
+
     @PostMapping("/updateCase")
     protected void updateCase(@RequestParam(value = "uuid", required = true) String uuid, @RequestParam(value = "caseName", required = true) String caseName,
             @RequestParam(value = "isStudent", required = true) Boolean isStudent,

@@ -241,19 +241,25 @@ public class EthereumServiceImpl implements EthereumService {
             log.error(ex.getMessage());
         }
 
-        log.info("checking of teh revocation status failed for {}", uuid);
+        log.info("checking of the revocation status failed for {}", uuid);
         return false;
     }
 
-    // public void revokeCredentials(String uuid) {
-    //     byte[] theUuid = ByteConverters.stringToBytes32(uuid).getValue();
-    //     try {
-    //         this.getRevocationContract().revoke(theUuid).sendAsync().get();
-    //     } catch (InterruptedException ex) {
-    //         log.error(ex.getMessage());
-    //     } catch (ExecutionException ex) {
-    //         log.error(ex.getMessage());
-    //     }
-    // }
+    @Override
+    public void deleteCase(String uuid) {
+
+        byte[] bUuid = ByteConverters.stringToBytes16(uuid).getValue();
+        try {
+            String functionCall = this.getContract().deleteCase(bUuid).encodeFunctionCall();
+
+            this.txManager.sendTransaction(DefaultGasProvider.GAS_PRICE, BigInteger.valueOf(1000000),
+            contract.getContractAddress(), functionCall, BigInteger.ZERO).getTransactionHash();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        
+
+    }
 
 }
