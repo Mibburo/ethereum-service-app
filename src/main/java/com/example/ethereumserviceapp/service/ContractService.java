@@ -43,9 +43,9 @@ public class ContractService {
     // private static final String ACCOUNT_KEY =
     // "24b26a6c3f3af6eb8b81e76c9c709548200af5d0f7f08480e9c391b01b036c56";
 
-    Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/580be6e0387a467e81347fb5b56299fa"));
+    Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/32a82076101f4ee09e88d723003f94bf"));
 
-    String contractAddress = "0x60fd4ed54f9826cb7bcf42a9378a22ab71fc176b";
+    String contractAddress = "0xCeb9b73BB47495bdF34f29dDa3f80f605040A360";
 
     // deploy contract to the block chain
     // change .send() to .encodeFunctionCall() and create transaction as in addCase
@@ -58,7 +58,7 @@ public class ContractService {
         // TransactionManager txManager = new FastRawTransactionManager(this.web3j,
         // credentials, processor);
 
-        final BigInteger gasPrice = BigInteger.valueOf(2200000);
+        final BigInteger gasPrice = BigInteger.valueOf(1300000);
         final BigInteger gasLimit = BigInteger.valueOf(4300000);
         final ContractGasProvider gasProvider = new StaticGasProvider(gasPrice, gasLimit);
         // Throws org.web3j.protocol.exceptions.ClientConnectionException: Invalid
