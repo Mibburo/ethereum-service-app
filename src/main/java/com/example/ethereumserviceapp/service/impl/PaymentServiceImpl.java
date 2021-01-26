@@ -1,6 +1,7 @@
 package com.example.ethereumserviceapp.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -65,12 +66,17 @@ public class PaymentServiceImpl implements PaymentService{
                     calculatePayment(caseToBePaid, ssiApp.get(), householdApps, currentDate, sync);
                 }
             }
+
+            //TODO replace localdate now with asynchrous rejected date
+            LocalDate rejectedDate = LocalDate.now();
+
+
             //if case is rejected then check the previous month history for days during which the case was accepted
             if (caseToBePaid.getState().equals(State.REJECTED) || caseToBePaid.getState().equals(State.SUSPENDED)) {
                 // get the number of days of the previous month during which the case was accepted
                 Long acceptedDates = caseToBePaid.getHistory().entrySet().stream().filter(
                         e -> (e.getKey().toLocalDate().compareTo(currentDate.toLocalDate().minusMonths(1)) >= 0) 
-                        && e.getKey().toLocalDate().isBefore(currentDate.toLocalDate())
+                        && e.getKey().toLocalDate().isBefore(rejectedDate == null? currentDate.toLocalDate() : rejectedDate.isBefore(currentDate.toLocalDate())? rejectedDate : currentDate.toLocalDate())
                         && e.getValue().equals(State.ACCEPTED)).count();
                 if(acceptedDates.intValue() > 0){
                     //check payment credentials

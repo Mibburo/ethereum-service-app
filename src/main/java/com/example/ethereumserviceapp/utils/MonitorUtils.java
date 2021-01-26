@@ -53,6 +53,12 @@ public class MonitorUtils extends EthAppUtils{
 
         List<PaymentCredential> changedCredentials = alteredCredentialsList(ssiApp, householdApps);
 
+        // add a dummy payment credential denoting the date tha case should have been rejected
+        // PaymentCredential rejectedCred = new PaymentCredential();
+        // rejectedCred.setDate(rejectedDate);
+        // rejectedCred.setValue("rejected");
+        // changedCredentials.add(rejectedCred);
+
         if(changedCredentials.isEmpty()){
             return;
         }
@@ -70,6 +76,19 @@ public class MonitorUtils extends EthAppUtils{
                 break;
             }
         }
+
+
+        // find the first rejected date if there is one
+        LocalDate firstRejectedDate = monitoredCase.getHistory().entrySet().stream().filter(e -> e.getValue().equals(State.REJECTED)).map(Map.Entry::getKey)
+        .findFirst().orElse(null).toLocalDate();
+
+        // if the case should have been rejected from the start then add all payments as offset
+        // if(rejectedDate.compareTo(firstAcceptedDate) <=0){
+        //     rejectAllPayments(paymentHistory, monitoredCase);
+        //     return;
+        // }
+
+        
         //check if any credential has been altered at a date before the start of the application and use that value as the base one
         for (Map.Entry<LocalDate, List<PaymentCredential>> mCred : monthlyGroupMap.entrySet()) {
             if(mCred.getKey().compareTo(firstAcceptedDate) > 0){
@@ -92,6 +111,19 @@ public class MonitorUtils extends EthAppUtils{
             LocalDate startOfMonth = ph.getPaymentDate().minusMonths(1).withDayOfMonth(1).toLocalDate();
             LocalDate endOfMonth = ph.getPaymentDate().minusMonths(1).withDayOfMonth(monthDays(ph.getPaymentDate().minusMonths(1).toLocalDate())).toLocalDate();
             Integer fullMonthDays = monthDays(startOfMonth);
+
+            // if rejected date is before start of month then all the payment is invalid and becomes offset
+            // if(rejectedDate.compareTo(startOfMonth) <= 0){
+            //     BigDecimal monthlyOffset = ph.getPayment();
+
+            //     monitoredCase.setOffset(monitoredCase.getOffset().add(monthlyOffset));
+
+            //     continue;
+            // }
+
+
+
+
             List<LocalDate> monthDates =  monitoredCase.getHistory().entrySet().stream().filter(
                     e -> e.getKey().toLocalDate().compareTo(startOfMonth) >= 0 && e.getKey().toLocalDate().compareTo(endOfMonth) <=0 && e.getValue().equals(State.ACCEPTED)).map(e -> e.getKey().toLocalDate()).collect(Collectors.toList());
 
@@ -141,6 +173,21 @@ public class MonitorUtils extends EthAppUtils{
                 for(int i = 0; i< monthlyGroupMap.get(startOfMonth).size(); i++){
                     List<LocalDate> offsetDates = new ArrayList<>();
                     final int innerI = i;
+                    
+
+                    // if the case should be rejected at this point then the payment of the rest of the month until either the end of the month or the actual rejection of the case is offset
+                    // if(monthlyGroupMap.get(startOfMonth).get(i).getValue().equals("rejected")){
+
+                    //     LocalDate end = firstRejectedDate == null? endOfMonth : firstRejectedDate.isBefore(endOfMonth)? firstRejectedDate : endOfMonth;
+                    //     Integer offsetDays = end.getDayOfMonth() - monthlyGroupMap.get(startOfMonth).get(i).getDate().getDayOfMonth();
+                    //     BigDecimal offsetPayment = ph.getPayment().divide(BigDecimal.valueOf(end.getDayOfMonth() - startOfMonth.getDayOfMonth()), 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(offsetDays));
+                    //     monitoredCase.setOffset(monitoredCase.getOffset().add(offsetPayment));
+                    //     break;
+                    // }
+
+
+
+
                     //if there are more credentials in the history list for this month then calculate the offset days and payment value for each period
                     if( i+1 <  monthlyGroupMap.get(startOfMonth).size() ) {
                         offsetDates = monitoredCase.getHistory().entrySet().stream().filter(
@@ -507,4 +554,11 @@ public class MonitorUtils extends EthAppUtils{
         return correctedPayment;
     } 
 
+    // private void rejectAllPayments(List<CasePayment> paymentHistory, Case monitoredCase){
+    //     for(CasePayment ph:paymentHistory){
+    //         BigDecimal monthlyOffset = ph.getPayment();
+
+    //         monitoredCase.setOffset(monitoredCase.getOffset().add(monthlyOffset));
+    //     }
+    // }
 }
